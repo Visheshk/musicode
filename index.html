@@ -16,12 +16,10 @@ var nodeDraw = [0, 0, 0, 0]; // the first is if the the node is being drawn,
 						  // the second is the disk number of where the node is being drawn from
 						  // the third is the nodes child - node number of where it's being drawn from
 						  // fourth is the correct (for our reference) node index
-	//nodeDraw.one = 0;
-	//nodeDraw.onePlace = 0; // the start disk and node number of the node being drawn from
 
-function stopDraw(){
-		//console.log(disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor);
-		disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'white';
+function stopDraw(clean){
+		if (clean == 0)
+			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'white';
 		nodeDraw[0] = 0;
 		nodeDraw[1] = 0;
 		nodeDraw[2] = 0;
@@ -78,17 +76,12 @@ function makeDisk(center){
 			path1.strokeColor = 'black';
 			path1.fillColor = 'red';
 			note.addChild(path1);
-			//console.log(noteE);
 			i = i + 1;
 		}
 		note.onClick = function(event){
-			//console.log(this);
 			if(nodeDraw[0] == 0){
-				
 				number = event.target.index;
-
 				if (disk1[n][7 - number] == 0){
-					//console.log(number);
 					disk1[n][7 - number] = 1;
 					note.children[number].fillColor = 'yellow';
 				}
@@ -96,8 +89,7 @@ function makeDisk(center){
 					disk1[n][7 - number] = 0;
 					note.children[number].fillColor = 'red';
 				}
-				//console.log(this.children[number]);
-				//console.log(this.parent.parent.number);
+				//console.log(this.parent.parent.number); - this does refer to d1, and print the correct disk number
 			}
 			else if(nodeDraw[0] == 1){
 				endNodeDraw();
@@ -111,8 +103,6 @@ function makeDisk(center){
 
 	var node1 = [0, 0, 0, 0, 0, 0, 0, 0];
 	node1.disk = diskIndex;
-
-	//disks[diskIndex] = 1;
 	var disk = disks[diskIndex];
 	disk.playState = playQ;
 	//disk.playArray = disk1;
@@ -124,13 +114,12 @@ function makeDisk(center){
 
 	function endNodeDraw(){
 		if (nodeDraw[1] != d1.number){
-			//var arr = 
-			//console.log
-			//console.log(disks, nodeDraw[1], nodeDraw[2]);
 			disks[nodeDraw[1]].nodeArray[nodeDraw[3]] = d1.number;
 			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'green';
+			stopDraw(1); //don't clean the green
 		}
-		stopDraw();
+		else
+			stopDraw(0);
 	}
 	
 
@@ -160,26 +149,19 @@ function makeDisk(center){
 						//Has to do with usage of event.target.index
 
 				if (node1[number] == 0){
-					//console.log(number);
-					//node1[number] = 1;
-					//nodes.children[numb].fillColor = 'green';
 					nodeDraw[0] = 1;
 					nodeDraw[1] = node1.disk;
-					//console.log(nodeDraw[1]);
-					//console.log(node1.disk);
+
 					nodeDraw[2] = numb;
 					nodeDraw[3] = number;
-					//console.log(nodeDraw[2]);
 					nodes.children[numb].fillColor = 'grey';
-					//console.log(nodeDraw[0], nodeDraw[1], nodeDraw[2]);
 
 				}
 				else if (node1[number] == 1){
 					node1[number] = 0;
-					stopDraw();
+					stopDraw(0);
 
 				}
-				//console.log(node1);
 			}
 			else if(nodeDraw[0] == 1){
 				endNodeDraw();
@@ -190,28 +172,11 @@ function makeDisk(center){
 
 	addNodes(center, 100);
 
-	/*d1.onClick = function (event){
-		console.log('happs', nodeDraw);
-		if(nodeDraw == 1){
-			console.log('clicked');
-			if (nodeDraw.one != d1.number){
-				//var arr = 
-				disks[nodeDraw.one].nodeArray[nodeDraw.onePlace] = d1.number;
-				disks[nodeDraw.one].nodeArray[nodeDraw.onePlace].fillColor = 'green';
-			}
-			stopDraw();
-		}
-	}*/
 	d1.onFrame = function (event){
 		if(playQ == 1 && play == 1)
 			d1.rotate(1);
 	}
 
-	
-	//disk.center = center;
-	//disk.spindle = spindle;
-	//console.log(disks);
-	//console.log(disks.diskIndex);
 	diskIndex++;
 
 }
