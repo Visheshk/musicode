@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Load the Paper.js library -->
+<script type="text/javascript" src="paper.js"></script>
+<!-- Define inlined PaperScript associate it with myCanvas -->
+<script type="text/paperscript" canvas="myCanvas">
+
+/*var lay1 = new Layer();
+lay1.activate();*/
+
+
+var center = new Point(200, 300);
+makeDisk(center);
+/*center += new Point(500, 0);
+makeDisk(center);*/
+
+var play1;
+
+function makeDisk(center){
+	var diskPlay = 1;
+	var disk1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]];
+
+
+	play1 = function doPlay(){
+		if(diskPlay == 0)
+			diskPlay = 1;
+		else if (diskPlay == 1)
+			diskPlay = 0;
+	}
+
+	var d1 = new Group();
+	var noteE = new Group();
+	var noteD = new Group();
+	var noteC = new Group();
+
+	d1.addChild(noteE);
+	d1.addChild(noteD);
+	d1.addChild(noteC);
+
+	
+
+	var spindle = new Path.Line(center, center + (new Point(130, 0)));
+	spindle.strokeColor = 'blue';
+	spindle.strokeWidth = 6;
+	spindle.strokeCap = 'round';
+
+	var nodes = new Group();
+
+	d1.addChild(nodes);
+
+	function makeSector(r1, note, n){
+		var i = 0;
+		while (i < 8){
+			var pt1 = new Point(r1 * Math.cos(i * Math.PI / 4), r1*Math.sin(i * Math.PI / 4)) + center;
+			var pt3 = new Point(r1 * Math.cos((i + 1) * Math.PI / 4), r1 * Math.sin((i + 1) * Math.PI / 4)) + center;
+			var pt2 = new Point(r1 * Math.cos((2*i + 1) * Math.PI / 8), r1 * Math.sin((2*i + 1) * Math.PI / 8)) + center;
+			var path1 = new Path.Arc(pt1, pt2, pt3);
+			path1.add(center);
+			path1.closed = true;
+			path1.strokeColor = 'black';
+			path1.fillColor = 'red';
+			note.addChild(path1);
+			//console.log(noteE);
+			i = i + 1;
+		}
+		note.onClick = function(event){
+			//console.log(this);
+			number = event.target.index;
+			if (disk1[n][7 - number] == 0){
+				console.log(number);
+				disk1[n][7 - number] = 1;
+				note.children[number].fillColor = 'yellow';
+			}
+			else if (disk1[n][7 - number] == 1){
+				disk1[n][7 - number] = 0;
+				note.children[number].fillColor = 'red';
+			}
+		}
+	}
+
+	makeSector(100, noteE, 4);
+	makeSector(70, noteD, 3);
+	makeSector(40, noteC, 2);
+
+	addNodes(center, 100);
+
+	var node1 = [0, 0, 0, 0, 0, 0, 0, 0];
+
+	function addNodes(center, rad){
+		var i = 0;
+		while (i < 8){
+			var pt = center + new Point(rad * Math.cos(i * Math.PI / 4), rad * Math.sin(i * Math.PI / 4));
+			var nodeCircle = new Path.Circle(pt, 10);
+			nodeCircle.strokeColor = 'black';
+			nodeCircle.fillColor = 'white';
+			nodes.addChild(nodeCircle);
+			i = i + 1;
+		}
+		nodes.onClick = function(event){
+			
+			numb = event.target.index;
+			var number = 0;
+			if (numb == 0)
+				number = numb;
+			else
+				number = 8 - numb;
+			if (node1[number] == 0){
+				console.log(number);
+				node1[number] = 1;
+				nodes.children[numb].fillColor = 'green';
+			}
+			else if (node1[number] == 1){
+				node1[number] = 0;
+				nodes.children[numb].fillColor = 'white';
+			}
+			console.log(node1);
+		}
+		i = i + 1;
+	}
+
+
+	d1.onFrame = function (event){
+		if(diskPlay == 1 && play == 1)
+			d1.rotate(1);
+	}
+}
+
+var play = 0;
+
+var playButton = new Path.RegularPolygon(new Point(500, 50), 3, 30);
+playButton.fillColor = 'green';
+playButton.rotate(90);
+playButton.onClick = function (event) {
+	if (play == 0){
+		play = 1;
+		play1();
+	}
+	else if (play == 1){
+		play = 0;
+	}
+}
+
+
+</script>
+</head>
+<body>
+	<canvas id="myCanvas" resize></canvas>
+</body>
+</html>
