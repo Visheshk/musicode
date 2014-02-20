@@ -35,10 +35,11 @@ function makeDisk(center){
 	var disk1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]];
 	
 	var play1 = function doPlay(){
-		if(diskPlay == 0)
-			diskPlay = 1;
-		else if (diskPlay == 1)
-			diskPlay = 0;
+		console.log('play toggle');
+		if(playQ == 0)
+			playQ = 1;
+		else if (playQ == 1)
+			playQ = 0;
 	}
 
 	var d1 = new Group();
@@ -102,15 +103,18 @@ function makeDisk(center){
 	makeSector(40, noteC, 2);
 
 	var node1 = [0, 0, 0, 0, 0, 0, 0, 0];
+	var angle = 0;
 	node1.disk = diskIndex;
+	disks[diskIndex] = {};
 	var disk = disks[diskIndex];
 	disk.playState = playQ;
-	//disk.playArray = disk1;
+	disk.playArray = disk1;
 	disk.d = d1;
 	disk.nodeArray = node1;
 	disk.number = diskIndex;
 	disk.play = play1;
 	disk.nodes = nodes;
+	disk.angle = angle;
 
 	function endNodeDraw(){
 		if (nodeDraw[1] != d1.number){
@@ -172,9 +176,61 @@ function makeDisk(center){
 
 	addNodes(center, 100);
 
+	var playMark = 0;
+
 	d1.onFrame = function (event){
-		if(playQ == 1 && play == 1)
+		if(playQ == 1 && play == 1){
 			d1.rotate(1);
+			angle++;
+			if (angle == 360)
+				angle = 0;
+
+			var step = Math.floor(angle / 45);
+			//console.log(step);
+			step = step % 8;
+			
+			if(angle % 45 == 0){
+				console.log(disks[d1.number].nodeArray);
+				playMark = 0;	
+				if (node1[step] != 0){
+					console.log(node1[step]);
+					disks[d1.number].play();
+					disks[node1[step]].play();
+				}
+				else{
+					console.log('no node');
+
+					var c = 2;
+					//we're in the step-th rotation of this.
+					//d1.notes.children, for k: 0 to size, 
+					//if disks[d1.number].playArray[]
+					//alternately if disk1[k + 2][step - 1] == 1
+						//disks[d1.number].notes.children[k][8 - step].fillColor = yellow
+					//if disk1[k][step] == 1
+						//disks[d1.number].notes.children[k + ][7 - step].fillColor = blue
+					while (c <= notes.children.length + 1){
+						if (disk1[c][step - 1] == 1){
+							notes.children[4 - c].children[8 - step].fillColor = 'yellow';
+						}
+
+						if (disk1[c][step] == 1){
+							notes.children[4 - c].children[7 - step].fillColor = 'blue';
+							//play corresponding tone here
+						}
+						c++;
+					}
+
+				}
+			}
+		}
+		/* if angle is 45 deg, reset play markers, *
+		check nodes, and shift play if existent,
+		else
+		* and play the music 
+		of my people
+		the corresponding sectors colored.
+
+		*/
 	}
 
 	diskIndex++;
@@ -183,7 +239,8 @@ function makeDisk(center){
 
 var ctr = new Point(200, 300);
 makeDisk(ctr);
-
+ctr += new Point(500, 0);
+makeDisk(ctr);
 
 var play = 0;
 
