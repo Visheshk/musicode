@@ -10,19 +10,33 @@
 lay1.activate();*/
 
 
-var center = new Point(200, 300);
-makeDisk(center);
-/*center += new Point(500, 0);
-makeDisk(center);*/
+var disks = [{}];
+var diskIndex = 0;
+var nodeDraw = [0, 0, 0, 0]; // the first is if the the node is being drawn,
+						  // the second is the disk number of where the node is being drawn from
+						  // the third is the nodes child - node number of where it's being drawn from
+						  // fourth is the correct (for our reference) node index
+	//nodeDraw.one = 0;
+	//nodeDraw.onePlace = 0; // the start disk and node number of the node being drawn from
 
-var play1;
+function stopDraw(){
+		//console.log(disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor);
+		disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'white';
+		nodeDraw[0] = 0;
+		nodeDraw[1] = 0;
+		nodeDraw[2] = 0;
+	}
+
 
 function makeDisk(center){
-	var diskPlay = 1;
+	
+
+	var playQ = 0;
+	if (diskIndex == 0)
+		playQ = 1;
 	var disk1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]];
-
-
-	play1 = function doPlay(){
+	
+	var play1 = function doPlay(){
 		if(diskPlay == 0)
 			diskPlay = 1;
 		else if (diskPlay == 1)
@@ -30,15 +44,17 @@ function makeDisk(center){
 	}
 
 	var d1 = new Group();
+	var notes = new Group();
 	var noteE = new Group();
 	var noteD = new Group();
 	var noteC = new Group();
 
-	d1.addChild(noteE);
-	d1.addChild(noteD);
-	d1.addChild(noteC);
+	d1.addChild(notes);
+	notes.addChild(noteE);
+	notes.addChild(noteD);
+	notes.addChild(noteC);
 
-	
+	d1.number = diskIndex;	
 
 	var spindle = new Path.Line(center, center + (new Point(130, 0)));
 	spindle.strokeColor = 'blue';
@@ -48,6 +64,7 @@ function makeDisk(center){
 	var nodes = new Group();
 
 	d1.addChild(nodes);
+
 
 	function makeSector(r1, note, n){
 		var i = 0;
@@ -66,15 +83,24 @@ function makeDisk(center){
 		}
 		note.onClick = function(event){
 			//console.log(this);
-			number = event.target.index;
-			if (disk1[n][7 - number] == 0){
-				console.log(number);
-				disk1[n][7 - number] = 1;
-				note.children[number].fillColor = 'yellow';
+			if(nodeDraw[0] == 0){
+				
+				number = event.target.index;
+
+				if (disk1[n][7 - number] == 0){
+					//console.log(number);
+					disk1[n][7 - number] = 1;
+					note.children[number].fillColor = 'yellow';
+				}
+				else if (disk1[n][7 - number] == 1){
+					disk1[n][7 - number] = 0;
+					note.children[number].fillColor = 'red';
+				}
+				//console.log(this.children[number]);
+				//console.log(this.parent.parent.number);
 			}
-			else if (disk1[n][7 - number] == 1){
-				disk1[n][7 - number] = 0;
-				note.children[number].fillColor = 'red';
+			else if(nodeDraw[0] == 1){
+				endNodeDraw();
 			}
 		}
 	}
@@ -83,14 +109,36 @@ function makeDisk(center){
 	makeSector(70, noteD, 3);
 	makeSector(40, noteC, 2);
 
-	addNodes(center, 100);
-
 	var node1 = [0, 0, 0, 0, 0, 0, 0, 0];
+	node1.disk = diskIndex;
+
+	//disks[diskIndex] = 1;
+	var disk = disks[diskIndex];
+	disk.playState = playQ;
+	//disk.playArray = disk1;
+	disk.d = d1;
+	disk.nodeArray = node1;
+	disk.number = diskIndex;
+	disk.play = play1;
+	disk.nodes = nodes;
+
+	function endNodeDraw(){
+		if (nodeDraw[1] != d1.number){
+			//var arr = 
+			//console.log
+			//console.log(disks, nodeDraw[1], nodeDraw[2]);
+			disks[nodeDraw[1]].nodeArray[nodeDraw[3]] = d1.number;
+			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'green';
+		}
+		stopDraw();
+	}
+	
 
 	function addNodes(center, rad){
 		var i = 0;
 		while (i < 8){
 			var pt = center + new Point(rad * Math.cos(i * Math.PI / 4), rad * Math.sin(i * Math.PI / 4));
+			//console.log(pt);
 			var nodeCircle = new Path.Circle(pt, 10);
 			nodeCircle.strokeColor = 'black';
 			nodeCircle.fillColor = 'white';
@@ -98,33 +146,79 @@ function makeDisk(center){
 			i = i + 1;
 		}
 		nodes.onClick = function(event){
-			
-			numb = event.target.index;
-			var number = 0;
-			if (numb == 0)
-				number = numb;
-			else
-				number = 8 - numb;
-			if (node1[number] == 0){
-				console.log(number);
-				node1[number] = 1;
-				nodes.children[numb].fillColor = 'green';
+			//if node is being drawn, make this 1
+			if(nodeDraw[0] == 0){
+				numb = event.target.index;
+				var number = 0;
+				if (numb == 0)
+					number = numb;
+				else
+					number = 8 - numb;
+				//numb is the child number in the group nodes.
+				//number is the correct index by location.
+				// *TODO: Figure out why numb is not the same as number. 
+						//Has to do with usage of event.target.index
+
+				if (node1[number] == 0){
+					//console.log(number);
+					//node1[number] = 1;
+					//nodes.children[numb].fillColor = 'green';
+					nodeDraw[0] = 1;
+					nodeDraw[1] = node1.disk;
+					//console.log(nodeDraw[1]);
+					//console.log(node1.disk);
+					nodeDraw[2] = numb;
+					nodeDraw[3] = number;
+					//console.log(nodeDraw[2]);
+					nodes.children[numb].fillColor = 'grey';
+					//console.log(nodeDraw[0], nodeDraw[1], nodeDraw[2]);
+
+				}
+				else if (node1[number] == 1){
+					node1[number] = 0;
+					stopDraw();
+
+				}
+				//console.log(node1);
 			}
-			else if (node1[number] == 1){
-				node1[number] = 0;
-				nodes.children[numb].fillColor = 'white';
+			else if(nodeDraw[0] == 1){
+				endNodeDraw();
 			}
-			console.log(node1);
 		}
 		i = i + 1;
 	}
 
+	addNodes(center, 100);
 
+	/*d1.onClick = function (event){
+		console.log('happs', nodeDraw);
+		if(nodeDraw == 1){
+			console.log('clicked');
+			if (nodeDraw.one != d1.number){
+				//var arr = 
+				disks[nodeDraw.one].nodeArray[nodeDraw.onePlace] = d1.number;
+				disks[nodeDraw.one].nodeArray[nodeDraw.onePlace].fillColor = 'green';
+			}
+			stopDraw();
+		}
+	}*/
 	d1.onFrame = function (event){
-		if(diskPlay == 1 && play == 1)
+		if(playQ == 1 && play == 1)
 			d1.rotate(1);
 	}
+
+	
+	//disk.center = center;
+	//disk.spindle = spindle;
+	//console.log(disks);
+	//console.log(disks.diskIndex);
+	diskIndex++;
+
 }
+
+var ctr = new Point(200, 300);
+makeDisk(ctr);
+
 
 var play = 0;
 
@@ -134,7 +228,6 @@ playButton.rotate(90);
 playButton.onClick = function (event) {
 	if (play == 0){
 		play = 1;
-		play1();
 	}
 	else if (play == 1){
 		play = 0;
