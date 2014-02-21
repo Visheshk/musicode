@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<title>Computunes - Programming music</title>
 <!-- Load the Paper.js library -->
 <script type="text/javascript" src="paper.js"></script>
 <!-- Define inlined PaperScript associate it with myCanvas -->
@@ -102,7 +104,7 @@ function makeDisk(center){
 	makeSector(70, noteD, 3);
 	makeSector(40, noteC, 2);
 
-	var node1 = [0, 0, 0, 0, 0, 0, 0, 0];
+	var node1 = [-1, -1, -1, -1, -1, -1, -1, -1];
 	var angle = 0;
 	node1.disk = diskIndex;
 	disks[diskIndex] = {};
@@ -119,6 +121,7 @@ function makeDisk(center){
 	function endNodeDraw(){
 		if (nodeDraw[1] != d1.number){
 			disks[nodeDraw[1]].nodeArray[nodeDraw[3]] = d1.number;
+			console.log(nodeDraw[1], disks[nodeDraw[1]].nodeArray, nodeDraw[3]);
 			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'green';
 			stopDraw(1); //don't clean the green
 		}
@@ -152,17 +155,17 @@ function makeDisk(center){
 				// *TODO: Figure out why numb is not the same as number. 
 						//Has to do with usage of event.target.index
 
-				if (node1[number] == 0){
+				if (node1[number] == -1){
 					nodeDraw[0] = 1;
-					nodeDraw[1] = node1.disk;
+					nodeDraw[1] = d1.number;
 
 					nodeDraw[2] = numb;
 					nodeDraw[3] = number;
 					nodes.children[numb].fillColor = 'grey';
 
 				}
-				else if (node1[number] == 1){
-					node1[number] = 0;
+				else if (node1[number] != -1){
+					node1[number] = -1;
 					stopDraw(0);
 
 				}
@@ -179,7 +182,13 @@ function makeDisk(center){
 	var playMark = 0;
 
 	d1.onFrame = function (event){
+		//var playQ = disks[d1.number].playState;
+		//var node1 = disks[d1.number].nodeArray;
+		//var disk1 = disks[d1.number].playArray;
+
 		if(playQ == 1 && play == 1){
+			console.log(d1.number);
+			console.log(disks[d1.number].nodeArray);
 			d1.rotate(1);
 			angle++;
 			if (angle == 360)
@@ -192,7 +201,7 @@ function makeDisk(center){
 			if(angle % 45 == 0){
 				console.log(disks[d1.number].nodeArray);
 				playMark = 0;	
-				if (node1[step] != 0){
+				if (node1[step] != -1){
 					console.log(node1[step]);
 					disks[d1.number].play();
 					disks[node1[step]].play();
