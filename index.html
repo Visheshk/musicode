@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<title>Computunes - Programming music</title>
+<title>Musicode - Programming music</title>
 <!-- Load the Paper.js library -->
 <script type="text/javascript" src="paper.js"></script>
 <!-- Define inlined PaperScript associate it with myCanvas -->
@@ -28,11 +28,10 @@ function stopDraw(clean){
 
 
 function makeDisk(center){
-	
-
 	var playQ = 0;
 	if (diskIndex == 0)
 		playQ = 1;
+
 	var disk1 = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0]];
 	
 	var play1 = function doPlay(){
@@ -139,7 +138,6 @@ function makeDisk(center){
 			nodeCircle.strokeColor = 'black';
 			nodeCircle.fillColor = 'white';
 			nodes.insertChild(-1, nodeCircle); // inserting at -1, ugly hack to get the nodes have the correct index
-			//console.log(pt, nodeCircle.index);
 			i = i + 1;
 		}
 		nodes.reverseChildren(); // reversing, part of ugly hack
@@ -147,11 +145,9 @@ function makeDisk(center){
 			//if node is being drawn, make this 1
 			if(nodeDraw[0] == 0){
 				number = event.target.index;
-				console.log(event.target.index);
-				//numb is the child number in the group nodes.
-				//number is the correct index by location.
-				// *TODO: Figure out why numb is not the same as number. 
-						//Has to do with usage of event.target.index
+				//console.log(event.target.index);
+
+				// *TODO: Figure out why above ugly hacks to fix index are required
 
 				if (node1[number] == -1){
 					nodeDraw[0] = 1;
@@ -159,12 +155,10 @@ function makeDisk(center){
 
 					nodeDraw[2] = number;
 					nodes.children[number].fillColor = 'grey';
-
 				}
 				else if (node1[number] != -1){
 					node1[number] = -1;
 					stopDraw(0);
-
 				}
 			}
 			else if(nodeDraw[0] == 1){
@@ -179,21 +173,12 @@ function makeDisk(center){
 	var playMark = 0;
 
 	d1.onFrame = function (event){
-		//var playQ = disks[d1.number].playState;
-		//var node1 = disks[d1.number].nodeArray;
-		//var disk1 = disks[d1.number].playArray;
 
 		if(playQ == 1 && play == 1){
-			//console.log(d1.number);
-			//console.log(disks[d1.number].nodeArray);
-			
-
 			var step = Math.floor(angle / 45);
-			//console.log(step);
 			step = step % 8;
 			
 			if(angle % 45 == 0){
-				//console.log(disks[d1.number].nodeArray);
 				playMark = 0;	
 				if (node1[step] != -1){
 					console.log(node1[step]);
@@ -201,8 +186,6 @@ function makeDisk(center){
 					disks[node1[step]].play();
 				}
 				else{
-					//console.log('no node');
-
 					var c = 0;
 					while (c < notes.children.length){
 						var prev = step - 1;
@@ -228,6 +211,7 @@ function makeDisk(center){
 				playQ = 0;
 			}*/
 		}
+
 		/* if angle is 45 deg, reset play markers, *
 		check nodes, and shift play if existent,
 		else
