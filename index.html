@@ -14,10 +14,9 @@ lay1.activate();*/
 
 var disks = [{}];
 var diskIndex = 0;
-var nodeDraw = [0, 0, 0, 0]; // the first is if the the node is being drawn,
+var nodeDraw = [0, 0, 0]; // the first is if the the node is being drawn,
 						  // the second is the disk number of where the node is being drawn from
-						  // the third is the nodes child - node number of where it's being drawn from
-						  // fourth is the correct (for our reference) node index
+						  // the third is the node number of where it's being drawn from
 
 function stopDraw(clean){
 		if (clean == 0)
@@ -73,35 +72,36 @@ function makeDisk(center){
 			var pt1 = new Point(r1 * Math.cos(i * Math.PI / 4), r1*Math.sin(i * Math.PI / 4)) + center;
 			var pt3 = new Point(r1 * Math.cos((i + 1) * Math.PI / 4), r1 * Math.sin((i + 1) * Math.PI / 4)) + center;
 			var pt2 = new Point(r1 * Math.cos((2*i + 1) * Math.PI / 8), r1 * Math.sin((2*i + 1) * Math.PI / 8)) + center;
+			//console.log(pt1, pt3);
 			var path1 = new Path.Arc(pt1, pt2, pt3);
 			path1.add(center);
 			path1.closed = true;
 			path1.strokeColor = 'black';
 			path1.fillColor = 'red';
-			note.addChild(path1);
+			note.insertChild(0, path1); // inserting at 0, ugly hack to get the sectors have the correct index
 			i = i + 1;
 		}
 		note.onClick = function(event){
 			if(nodeDraw[0] == 0){
 				number = event.target.index;
-				if (disk1[n][7 - number] == 0){
-					disk1[n][7 - number] = 1;
+				//console.log(event.target.index);
+				if (disk1[n][number] == 0){
+					disk1[n][number] = 1;
 					note.children[number].fillColor = 'yellow';
+					console.log(n, number, note.index);
 				}
-				else if (disk1[n][7 - number] == 1){
-					disk1[n][7 - number] = 0;
+				else if (disk1[n][number] == 1){
+					disk1[n][number] = 0;
 					note.children[number].fillColor = 'red';
 				}
-				//console.log(this.parent.parent.number); - this does refer to d1, and print the correct disk number
 			}
 			else if(nodeDraw[0] == 1){
 				endNodeDraw();
 			}
 		}
 	}
-
-	makeSector(100, noteE, 4);
-	makeSector(70, noteD, 3);
+	makeSector(100, noteE, 0);
+	makeSector(70, noteD, 1);
 	makeSector(40, noteC, 2);
 
 	var node1 = [-1, -1, -1, -1, -1, -1, -1, -1];
@@ -120,8 +120,8 @@ function makeDisk(center){
 
 	function endNodeDraw(){
 		if (nodeDraw[1] != d1.number){
-			disks[nodeDraw[1]].nodeArray[nodeDraw[3]] = d1.number;
-			console.log(nodeDraw[1], disks[nodeDraw[1]].nodeArray, nodeDraw[3]);
+			disks[nodeDraw[1]].nodeArray[nodeDraw[2]] = d1.number;
+			console.log(nodeDraw[1], disks[nodeDraw[1]].nodeArray, nodeDraw[2]);
 			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'green';
 			stopDraw(1); //don't clean the green
 		}
@@ -138,18 +138,16 @@ function makeDisk(center){
 			var nodeCircle = new Path.Circle(pt, 10);
 			nodeCircle.strokeColor = 'black';
 			nodeCircle.fillColor = 'white';
-			nodes.addChild(nodeCircle);
+			nodes.insertChild(-1, nodeCircle); // inserting at -1, ugly hack to get the nodes have the correct index
+			//console.log(pt, nodeCircle.index);
 			i = i + 1;
 		}
+		nodes.reverseChildren(); // reversing, part of ugly hack
 		nodes.onClick = function(event){
 			//if node is being drawn, make this 1
 			if(nodeDraw[0] == 0){
-				numb = event.target.index;
-				var number = 0;
-				if (numb == 0)
-					number = numb;
-				else
-					number = 8 - numb;
+				number = event.target.index;
+				console.log(event.target.index);
 				//numb is the child number in the group nodes.
 				//number is the correct index by location.
 				// *TODO: Figure out why numb is not the same as number. 
@@ -159,9 +157,8 @@ function makeDisk(center){
 					nodeDraw[0] = 1;
 					nodeDraw[1] = d1.number;
 
-					nodeDraw[2] = numb;
-					nodeDraw[3] = number;
-					nodes.children[numb].fillColor = 'grey';
+					nodeDraw[2] = number;
+					nodes.children[number].fillColor = 'grey';
 
 				}
 				else if (node1[number] != -1){
@@ -187,19 +184,16 @@ function makeDisk(center){
 		//var disk1 = disks[d1.number].playArray;
 
 		if(playQ == 1 && play == 1){
-			console.log(d1.number);
-			console.log(disks[d1.number].nodeArray);
-			d1.rotate(1);
-			angle++;
-			if (angle == 360)
-				angle = 0;
+			//console.log(d1.number);
+			//console.log(disks[d1.number].nodeArray);
+			
 
 			var step = Math.floor(angle / 45);
 			//console.log(step);
 			step = step % 8;
 			
 			if(angle % 45 == 0){
-				console.log(disks[d1.number].nodeArray);
+				//console.log(disks[d1.number].nodeArray);
 				playMark = 0;	
 				if (node1[step] != -1){
 					console.log(node1[step]);
@@ -207,23 +201,20 @@ function makeDisk(center){
 					disks[node1[step]].play();
 				}
 				else{
-					console.log('no node');
+					//console.log('no node');
 
-					var c = 2;
-					//we're in the step-th rotation of this.
-					//d1.notes.children, for k: 0 to size, 
-					//if disks[d1.number].playArray[]
-					//alternately if disk1[k + 2][step - 1] == 1
-						//disks[d1.number].notes.children[k][8 - step].fillColor = yellow
-					//if disk1[k][step] == 1
-						//disks[d1.number].notes.children[k + ][7 - step].fillColor = blue
-					while (c <= notes.children.length + 1){
-						if (disk1[c][step - 1] == 1){
-							notes.children[4 - c].children[8 - step].fillColor = 'yellow';
+					var c = 0;
+					while (c < notes.children.length){
+						var prev = step - 1;
+						if (prev == -1){
+							prev = 7;
+						}
+						if (disk1[c][prev] == 1){
+							notes.children[c].children[prev].fillColor = 'yellow';
 						}
 
 						if (disk1[c][step] == 1){
-							notes.children[4 - c].children[7 - step].fillColor = 'blue';
+							notes.children[c].children[step].fillColor = 'blue';
 							//play corresponding tone here
 						}
 						c++;
@@ -231,6 +222,11 @@ function makeDisk(center){
 
 				}
 			}
+			d1.rotate(1);
+			angle++;
+			/*if (angle == 361){
+				playQ = 0;
+			}*/
 		}
 		/* if angle is 45 deg, reset play markers, *
 		check nodes, and shift play if existent,
