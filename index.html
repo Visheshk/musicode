@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Musicode by Visheshk</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Musicode</h1>
+        <p>A music programming puzzle game</p>
+
+        <p class="view"><a href="https://github.com/Visheshk/musicode">View the Project on GitHub <small>Visheshk/musicode</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/Visheshk/musicode/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Visheshk/musicode/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Visheshk/musicode">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>
+<a name="musicode" class="anchor" href="#musicode"><span class="octicon octicon-link"></span></a>Musicode</h2>
+
+<p>A music programming puzzle game.
+With heavy inspiration from <a href="http://www.robozzle.com">RoboZZle</a>, we wanted to make a more open ended game that involved making music - something we saw as potentially more fun, and try to make it easier so that there's more scope to play around, and also manage solving puzzles.</p>
+
+<h2>
+<a name="prototype" class="anchor" href="#prototype"><span class="octicon octicon-link"></span></a><a href="http://visheshk.github.io/musicode/prototype.html">Prototype</a>
+</h2>
+
+<p>The prototype supports making disks.
+Each disk has all these properties, where it's supposed to play music, and which nodes send it to which other disk.</p>
+
+<h2>
+<a name="interface" class="anchor" href="#interface"><span class="octicon octicon-link"></span></a>Interface</h2>
+
+<p>Every disk is divided into 8 time-unit-sectors. This is to allow for description of 8-beat music. Further, every disk has 3 concentric circles. These are to be associated with different notes. For instance, markings in the smallest circle, play C, the next play D, the next play E, and so on.</p>
+
+<p>The nodes on the circumference, are to link one disk to another. This is like a function call. When the 'spindle' reaches a linked node, it stops playing the current disk, and starts playing the disk it is linked to.</p>
+
+<h2>
+<a name="limitations" class="anchor" href="#limitations"><span class="octicon octicon-link"></span></a>Limitations</h2>
+
+<p>Currently, the UI is very poorly implemented. There's supposed to be support for adding and removing disks, and then we plan to introduce a puzzle system, where the music you make is displayed more clearly, and the aim is to make music or notes of a particularly described manner.</p>
+
+<p>A strong technical flaw, is the lack of stacking of functions, which makes recursion and many aspects of function calling redundant/incorrectly done. When another function is called, that function runs from the start, and all its operations are popped from a stack sequentially. Calls to another place in between cause that function to happen, and the compiler to return to the previously stacked operations after. None of this happens in the current emtaphor, as made. A link only causes the other disk to start playing from wherever it was. Yet to explore how to do this, if at all.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Visheshk">Visheshk</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
