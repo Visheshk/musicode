@@ -10,7 +10,13 @@
 
 /*var lay1 = new Layer();
 lay1.activate();*/
-
+var cNote = new Audio("notes/sa.mp3");
+var dNote = new Audio("notes/re.mp3");
+var eNote = new Audio("notes/ga.mp3");
+playNotes = new Array(3);
+playNotes[0] = cNote;
+playNotes[1] = dNote;
+playNotes[2] = eNote;
 
 var disks = [{}];
 var diskIndex = 0;
@@ -19,8 +25,14 @@ var nodeDraw = [0, 0, 0]; // the first is if the the node is being drawn,
 						  // the third is the node number of where it's being drawn from
 
 function stopDraw(clean){
-		if (clean == 0)
+		if (clean == 0){
 			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'white';
+			
+			console.log(disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine);
+			if (disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine)
+				disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.removeSegments();
+		}
+
 		nodeDraw[0] = 0;
 		nodeDraw[1] = 0;
 		nodeDraw[2] = 0;
@@ -47,6 +59,8 @@ function makeDisk(center){
 	var noteE = new Group();
 	var noteD = new Group();
 	var noteC = new Group();
+
+
 
 	d1.addChild(notes);
 	notes.addChild(noteE);
@@ -122,12 +136,17 @@ function makeDisk(center){
 			disks[nodeDraw[1]].nodeArray[nodeDraw[2]] = d1.number;
 			console.log(nodeDraw[1], disks[nodeDraw[1]].nodeArray, nodeDraw[2]);
 			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].fillColor = 'green';
-			stopDraw(1); //don't clean the green
+
+			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.lastSegment.remove();
+			disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.addSegment(d1.position);
+
+		    stopDraw(1); //don't clean the green
 		}
-		else
+		else{
+		    console.log('remove nodeLine');
 			stopDraw(0);
+    	}
 	}
-	
 
 	function addNodes(center, rad){
 		var i = 0;
@@ -138,6 +157,7 @@ function makeDisk(center){
 			nodeCircle.strokeColor = 'black';
 			nodeCircle.fillColor = 'white';
 			nodes.insertChild(-1, nodeCircle); // inserting at -1, ugly hack to get the nodes have the correct index
+			//console.log(nodes.children[-1].position);
 			i = i + 1;
 		}
 		nodes.reverseChildren(); // reversing, part of ugly hack
@@ -155,6 +175,14 @@ function makeDisk(center){
 
 					nodeDraw[2] = number;
 					nodes.children[number].fillColor = 'grey';
+
+			        if (nodes.children[number].nodeLine){
+			        	nodes.children[number].nodeLine.removeSegments();
+			        	nodes.children[number].nodeLine.remove();
+			        }
+			        nodes.children[number].nodeLine = new Path.Line(nodes.children[number].position, event.point);
+			        nodes.children[number].nodeLine.strokeColor = 'black';
+			        console.log(nodes.children[number].nodeLine);
 				}
 				else if (node1[number] != -1){
 					node1[number] = -1;
@@ -165,7 +193,8 @@ function makeDisk(center){
 				endNodeDraw();
 			}
 		}
-		i = i + 1;
+
+    i = i + 1;
 	}
 
 	addNodes(center, 100);
@@ -185,46 +214,56 @@ function makeDisk(center){
 					disks[d1.number].play();
 					disks[node1[step]].play();
 				}
-				else{
-					var c = 0;
-					while (c < notes.children.length){
-						var prev = step - 1;
-						if (prev == -1){
-							prev = 7;
-						}
-						if (disk1[c][prev] == 1){
-							notes.children[c].children[prev].fillColor = 'yellow';
-						}
-
-						if (disk1[c][step] == 1){
-							notes.children[c].children[step].fillColor = 'blue';
-							//play corresponding tone here
-						}
-						c++;
+				var c = 0;
+				while (c < notes.children.length){
+					var prev = step - 1;
+					if (prev == -1){
+						prev = 7;
+					}
+					if (disk1[c][prev] == 1){
+						notes.children[c].children[prev].fillColor = 'yellow';
+						playNotes[c].currentTime = 0;
 					}
 
+					if (disk1[c][step] == 1){
+						notes.children[c].children[step].fillColor = 'blue';
+						playNotes[c].play();
+						//play corresponding tone here
+					}
+					c++;
 				}
+
 			}
 			d1.rotate(1);
 			angle++;
 			/*if (angle == 361){
 				playQ = 0;
 			}*/
+
+	    //update nodeLines here
+		    for (var k = 0; k < 8; k++){
+		        //nodeLines.children[k].firstSegment = nodes.children[nodeLines.children[k].number].position;
+		        if (disks[d1.number].nodes.children[k].nodeLine){
+		        	disks[d1.number].nodes.children[k].nodeLine.firstSegment.remove();
+		        	disks[d1.number].nodes.children[k].nodeLine.addSegment(nodes.children[k].position);
+		        	disks[d1.number].nodes.children[k].nodeLine.reverse();
+		        }
+		    }
 		}
-
-		/* if angle is 45 deg, reset play markers, *
-		check nodes, and shift play if existent,
-		else
-		* and play the music 
-		of my people
-		the corresponding sectors colored.
-
-		*/
 	}
 
 	diskIndex++;
 
 }
+
+function onMouseMove(event){
+  if(nodeDraw[0] == 1){
+  	disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.lastSegment.remove();
+  	disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.addSegment(event.point);
+  	disks[nodeDraw[1]].nodes.children[nodeDraw[2]].nodeLine.sendToBack();
+  }
+}
+
 
 var ctr = new Point(200, 300);
 makeDisk(ctr);
