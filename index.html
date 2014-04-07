@@ -54,11 +54,14 @@ function makeDisk(center){
 	
 	var play1 = function doPlay(){
 		console.log('play toggle');
-		playString.content += '/';
-		if(playQ == 0)
+
+		if(playQ == 0){
 			playQ = 1;
-		else if (playQ == 1)
+		}
+		else if (playQ == 1){
 			playQ = 0;
+			playString.content += ' / ';
+		}
 	}
 
 	var d1 = new Group();
