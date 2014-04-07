@@ -13,10 +13,15 @@ lay1.activate();*/
 var cNote = new Audio("notes/sa.mp3");
 var dNote = new Audio("notes/re.mp3");
 var eNote = new Audio("notes/ga.mp3");
+//cNote.addEventListener("canplay",function() { cNote.currentTime = 0;});
+//dNote.addEventListener("canplay",function() { dNote.currentTime = 0;});
+//eNote.addEventListener("canplay",function() { eNote.currentTime = 0;});
+
 playNotes = new Array(3);
 playNotes[0] = cNote;
 playNotes[1] = dNote;
 playNotes[2] = eNote;
+
 var playedString = '';
 
 var playString = new PointText(new Point(50, 90));
@@ -231,6 +236,7 @@ function makeDisk(center){
 					}
 					if (disk1[c][prev] == 1){
 						notes.children[c].children[prev].fillColor = 'yellow';
+						playNotes[c].load();
 						//playNotes[c].currentTime = 0;
 					}
 
